@@ -1,0 +1,30 @@
+* Build
+#+BEGIN_SRC bash
+docker build -t paddlehub:2.3.1 .
+#+END_SRC
+
+* Deploy
+#+BEGIN_SRC bash
+mkdir -p $HOME/local/paddlehub
+
+cat << EOF > $HOME/local/paddlehub/config.json
+{
+    "modules_info": {
+        "ch_pp-ocrv3": {
+            "init_args": {
+                "version": "1.2.0"
+            },
+            "predict_args": {
+                "use_gpu": false
+            }
+        }
+    },
+    "port": 8866,
+    "use_multiprocess": true
+}
+EOF
+
+docker run --restart=always --name pp-hub -it -d -p 8866:8866 -v $HOME/local/paddlehub:/hub paddlehub:2.3.1
+docker exec pp-hub python -m pip install shapely pyclipper
+#+END_SRC
+
